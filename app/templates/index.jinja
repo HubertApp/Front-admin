@@ -1,0 +1,87 @@
+{% extends 'base.jinja'%}
+{% block content%}
+<div class="p-4 min-w-[50%] flex flex-col items-center">
+    <div class="w-full">
+        <h1 class="text-3xl font-bold text-neutral">Manage API(s)</h1>
+        <div class="divider"></div>
+        <section class="w-full flex justify-between py-3">
+            <label class="input">
+                <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none"
+                        stroke="currentColor">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </g>
+                </svg>
+                <input type="search" class="grow" placeholder="Search" />
+            </label>
+            <a class="btn btn-primary" href="/api">Ajouter une API</a>
+        </section>
+        <section class="py-3 flex flex-col items-center">
+            <div class="w-full flex gap-3">
+                <select class="select">
+                    <option disabled selected>Filtrer par état</option>
+                    <option>En ligne</option>
+                    <option>Hors ligne</option>
+                    <option>En intégration</option>
+                </select>
+                <select class="select">
+                    <option disabled selected>Filtrer par type</option>
+                    <option>GTFS</option>
+                    <option>GTFS-RT</option>
+                    <option>NetEX</option>
+                    <option>GeoJSON</option>
+                </select>
+                <div class="w-full flex flex-1 justify-end">
+                    <button class="btn btn-secondary btn-sm">Exporter CSV</button>
+                </div>
+
+            </div>
+
+        </section>
+        <section class="py-3">
+            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Titre</th>
+                            <th>URL</th>
+                            <th>Etat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>1</th>
+                            <td>Cy Ganderton</td>
+                            <td>Quality Control Specialist</td>
+                            <td>Blue</td>
+                        </tr>
+                        <tr>
+                            <th>2</th>
+                            <td>Hart Hagerty</td>
+                            <td>Desktop Support Technician</td>
+                            <td>Purple</td>
+                        </tr>
+                        <tr>
+                            <th>3</th>
+                            <td>Brice Swyre</td>
+                            <td>Tax Accountant</td>
+                            <td>Red</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="flex flex-col items-center p-3">
+            <div class="join">
+                <button class="join-item btn btn-md">1</button>
+                <button class="join-item btn btn-md btn-active">2</button>
+                <button class="join-item btn btn-md">3</button>
+                <button class="join-item btn btn-md">4</button>
+            </div>
+        </section>
+    </div>
+
+</div>
+{% endblock%}

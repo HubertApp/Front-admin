@@ -1,0 +1,32 @@
+
+[data-theme="light"]  {
+  color-scheme: "light";
+  --color-base-100: oklch(98% 0.003 247.858);
+  --color-base-200: #E9EEF1;
+  --color-base-300: #E2E1E1;
+  --color-base-content: oklch(21% 0.006 285.885);
+  --color-primary: #1B9AAA;
+  --color-primary-content: oklch(97.017% 0.01126 269.573);
+  --color-secondary: #919EAB;
+  --color-secondary-content: oklch(97.017% 0.01126 269.573);
+  --color-accent: oklch(70% 0.213 47.604);
+  --color-accent-content: oklch(93% 0.034 272.788);
+  --color-neutral: #272727;
+  --color-neutral-content: oklch(92% 0.004 286.32);
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(76% 0.177 163.223);
+  --color-success-content: oklch(37% 0.077 168.94);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: oklch(64% 0.246 16.439);
+  --color-error-content: oklch(27% 0.105 12.094);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1.5px;
+  --depth: 1;
+  --noise: 0;
+}

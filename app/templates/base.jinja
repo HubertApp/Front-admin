@@ -1,0 +1,97 @@
+<!DOCTYPE>
+<html data-theme="light">
+
+<head>
+    <title>{% block title %}Panel Administration - Hubbert App{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <div class="drawer lg:drawer-open">
+        <input id="my-drawer-4" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content">
+            <nav class="navbar w-full bg-primary">
+                <label for="my-drawer-4" aria-label="open sidebar" class="btn btn-square btn-ghost hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linejoin="round"
+                        stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"
+                        class="my-1.5 inline-block size-4">
+                        <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z">
+                        </path>
+                        <path d="M9 4v16"></path>
+                        <path d="M14 10l2 2l-2 2"></path>
+                    </svg>
+                </label>
+            </nav>
+            <div class="p-6">{% block content %}{% endblock %}</div>
+        </div>
+
+        <div class="drawer-side">
+            <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"></label>
+            <div class="flex min-h-full flex-col items-start bg-neutral text-neutral-content w-60">
+                <ul class="menu w-full bg-zinc-600 mt-6">
+
+                    <li>
+                        <button class="hover:bg-zinc-500" data-tip="Homepage">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linejoin="round"
+                                stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"
+                                class="my-1.5 inline-block size-4">
+                                <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path>
+                                <path
+                                    d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z">
+                                </path>
+                            </svg>
+                            <span class="is-drawer-close:hidden">Home</span>
+                        </button>
+                    </li>
+
+                    <li>
+                        <button class="hover:bg-zinc-500" data-tip="Homepage">
+                            <span class="is-drawer-close:hidden">Manage API(s)</span>
+                        </button>
+                    </li>
+
+                    <li>
+                        <button class="hover:bg-zinc-500" data-tip="Settings">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linejoin="round"
+                                stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"
+                                class="my-1.5 inline-block size-4">
+                                <path d="M20 7h-9"></path>
+                                <path d="M14 17H5"></path>
+                                <circle cx="17" cy="17" r="3"></circle>
+                                <circle cx="7" cy="7" r="3"></circle>
+                            </svg>
+                            <span class="is-drawer-close:hidden">Settings</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="toast toast-end">
+            {% for message in messages %}
+            <div id="flash-message"
+                class="alert alert-{{ message[1] }} shadow-lg transition-opacity duration-[3000ms] ease-out opacity-100">
+                <span>{{ message[0] }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+        setTimeout(() => {
+            const flashMessage = document.getElementById('flash-message');
+            if (flashMessage) {
+                flashMessage.classList.remove('opacity-100');
+                flashMessage.classList.add('opacity-0')
+                setTimeout(() => {
+                    flashMessage.remove();
+                }, 3000);
+            }
+        }, 3000);
+    </script>
+</body>
+
+</html>

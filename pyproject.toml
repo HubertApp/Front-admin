@@ -1,0 +1,14 @@
+[project]
+name = "front-admin"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "dotenv>=0.9.9",
+    "fastapi[standard]>=0.124.0",
+    "itsdangerous>=2.2.0",
+    "requests>=2.32.5",
+    "tailwind>=3.1.5b0",
+    "wtforms>=3.2.1",
+]
