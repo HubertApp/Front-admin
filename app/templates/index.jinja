@@ -51,24 +51,14 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for api in apis %}
                         <tr>
-                            <th>1</th>
-                            <td>Cy Ganderton</td>
-                            <td>Quality Control Specialist</td>
-                            <td>Blue</td>
+                            <th>{{ api.id }}</th>
+                            <td>{{ api.title }}</td>
+                            <td>{{ api.endpointUrl }}</td>
+                            <td>En ligne</td>
                         </tr>
-                        <tr>
-                            <th>2</th>
-                            <td>Hart Hagerty</td>
-                            <td>Desktop Support Technician</td>
-                            <td>Purple</td>
-                        </tr>
-                        <tr>
-                            <th>3</th>
-                            <td>Brice Swyre</td>
-                            <td>Tax Accountant</td>
-                            <td>Red</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
