@@ -16,25 +16,29 @@ app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
 
 @app.get("/")
-async def index(request: Request):
+async def index(request: Request, page: int = 1, limit: int = 25):
     async with httpx.AsyncClient() as client:
         query = """
-            query {
-                getApis {
-                    id
-                    title
-                    type
-                    apiKey
-                    description
-                    endpointUrl
+            query GetApis($page: Int!, $limit: Int!){
+                getApis(page: $page, pageSize: $limit) {
+                    items{
+                        id
+                        title
+                        type
+                        endpointUrl
+                    }
+                    totalCount
+                    pageSize
+                    page
                 }
             }
         """
-        response = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
+        variables = {"page": page, "limit": limit}
+        response = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
     if response.status_code == 200:
-        apis = response.json().get("data", {}).get("getApis", [])
-        return templates.TemplateResponse("index.jinja", {"request": request, "apis": apis, "messages": request.session.pop('flash_messages', [])})
-    return templates.TemplateResponse("index.jinja", {"request": request, "messages": request.session.pop('flash_messages', []), "apis": []})
+        data = response.json().get("data", {}).get("getApis", [])
+        return templates.TemplateResponse("index.jinja", {"request": request, "data": data, "messages": request.session.pop('flash_messages', [])})
+    return templates.TemplateResponse("index.jinja", {"request": request, "messages": request.session.pop('flash_messages', []), "data": {"items": [], "total": 0, "totalPages": 0, "page": page}})
 
 @app.get("/api")
 @app.post("/api")
