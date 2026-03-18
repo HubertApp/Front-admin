@@ -1,10 +1,21 @@
 {% extends 'base.jinja'%}
 {% from './_partials/_form_errors.jinja' import form_errors%}
 {% block content%}
+<a href="/" class="btn btn-secondary mb-6">Retour</a>
 <div class="bg-base-200 p-4 min-w-[50%] flex flex-col items-center">
-    <h1 class="text-3xl font-bold text-neutral">Ajouter une API</h1>
+    <h1 class="text-3xl font-bold text-neutral">Consultation de l'api "{{api_infos.get('title')}}"</h1>
     <div class="divider"></div>
-    <form method="POST" action="" class="w-full max-w-lg">
+    <form method="post" action="" class="w-full max-w-lg">
+        <div class="mb-4 flex flex-col gap-3">
+            <div class="flex flex-1 justify-between">
+                <span class="flex gap-1"><p class="font-semibold">ID :</p><p>1</p></span>
+                <span class="flex gap-1"><p class="font-semibold">Statut :</p><p>Online (1h ago)</p></span>
+            </div>
+            <div class="flex flex-1 justify-between">
+                <span class="flex gap-1"><p class="font-semibold">Date création :</p><p>01/01/2021</p></span>
+                <span class="flex gap-1"><p class="font-semibold">Date modification :</p><p>01/01/2026</p></span>
+            </div>
+        </div>
         <div class="mb-4">
             {{ form.title.label(class_="font-medium text-primary") }}
             {{ form.title(class_="mt-1 w-full input input-primary") }}

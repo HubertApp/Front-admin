@@ -3,9 +3,12 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import httpx
-from app.forms.forms import APIForm
+from app.forms.forms import APIForm, CreateAPIForm, ModifyAPIForm
 import requests, dotenv, os
 from starlette.middleware.sessions import SessionMiddleware
+
+from app.objects.api_obj import ApiResponseObj
+from app.services.api_service import get_apis_service, create_api_service, get_api_by_id_service, modify_api_service
 
 dotenv.load_dotenv()
 
@@ -17,66 +20,22 @@ app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
 @app.get("/")
 async def index(request: Request, page: int = 1, limit: int = 25):
-    async with httpx.AsyncClient() as client:
-        query = """
-            query GetApis($page: Int!, $limit: Int!){
-                getApis(page: $page, pageSize: $limit) {
-                    items{
-                        id
-                        title
-                        type
-                        endpointUrl
-                    }
-                    totalCount
-                    pageSize
-                    page
-                }
-            }
-        """
-        variables = {"page": page, "limit": limit}
-        response = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
+    response = await get_apis_service(page, limit)
     if response.status_code == 200:
         data = response.json().get("data", {}).get("getApis", [])
         return templates.TemplateResponse("index.jinja", {"request": request, "data": data, "messages": request.session.pop('flash_messages', [])})
     return templates.TemplateResponse("index.jinja", {"request": request, "messages": request.session.pop('flash_messages', []), "data": {"items": [], "total": 0, "totalPages": 0, "page": page}})
 
-@app.get("/api")
-@app.post("/api")
-async def api_list(request: Request):
-    form = APIForm()
+@app.get("/api/create")
+@app.post("/api/create")
+async def api_create(request: Request):
+    form = CreateAPIForm()
     request.session.setdefault('flash_messages', [])
     if request.method == "POST":
         form_data = await request.form()
-        form = APIForm(formdata=form_data)
+        form = CreateAPIForm(formdata=form_data)
         if form.validate():
-            query = """
-                mutation CreateApi($title: String!, $type: String!, $apiKey: String!, $description: String!, $endpointUrl: String!) {
-                    createApi(input: {
-                        title: $title,
-                        type: $type,
-                        apiKey: $apiKey,
-                        description: $description,
-                        endpointUrl: $endpointUrl
-                    }) {
-                        id
-                        title
-                        type
-                        apiKey
-                        description
-                        endpointUrl
-                    }
-                }
-            """
-            variables = {
-                "title": form.title.data,
-                "type": form.type.data,
-                "apiKey": form.api_key.data,
-                "description": form.description.data,
-                "endpointUrl": form.endpoint_url.data
-            }
-            # Logique à changer quand le microservice sera directement connecté à la gateway
-            async with httpx.AsyncClient() as client:
-                response = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
+            response = await create_api_service(form)
             if response.status_code == 200:
                 print("Données envoyées avec succès au gateway.")
                 request.session['flash_messages'].append(("API enregistrée.", "success"))
@@ -87,3 +46,38 @@ async def api_list(request: Request):
             request.session['flash_messages'].append(("Données de formulaire invalides.", "error"))
 
     return templates.TemplateResponse("add_api.jinja", {"request": request, "form" : form, "messages": request.session.pop('flash_messages', [])})
+
+
+@app.get("/api/{api_id}")
+@app.post("/api/{api_id}")
+async def api_details(request: Request, api_id: str):
+    request.session.setdefault('flash_messages', [])
+    api_infos_response = await get_api_by_id_service(api_id)
+    data = api_infos_response.json().get("data", {}).get("getApiById", {})
+    form = ModifyAPIForm(obj=ApiResponseObj(**data))
+    if request.method == "POST":
+        form_data = await request.form()
+        new_data_form = ModifyAPIForm(form_data)
+        if new_data_form.validate():
+            old_datas = {
+                cle: valeur
+                for cle, valeur in form.data.items()
+                if cle not in ['submit', 'csrf_token']
+            }
+            new_datas = {
+                cle: valeur
+                for cle, valeur in form_data.items()
+                if cle not in ['submit', 'csrf_token']
+            }
+            if old_datas == new_datas:
+                return RedirectResponse(url='/', status_code=303)
+            response = await modify_api_service(new_data_form, int(api_id))
+            if response.status_code == 200:
+                print("Données envoyées avec succès au gateway.")
+                request.session['flash_messages'].append(("API enregistrée.", "success"))
+                return RedirectResponse(url='/', status_code=303)
+
+            request.session['flash_messages'].append(("Erreur lors de l'enregistrement de l'API.", "error"))
+        else:
+            request.session['flash_messages'].append(("Données de formulaire invalides.", "error"))
+    return templates.TemplateResponse("api_details.jinja", {"request": request, "form": form, "api_infos": data, "messages": request.session.pop('flash_messages', [])})

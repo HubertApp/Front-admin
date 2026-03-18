@@ -15,7 +15,7 @@
                 </svg>
                 <input type="search" class="grow" placeholder="Search" />
             </label>
-            <a class="btn btn-primary" href="/api">Ajouter une API</a>
+            <a class="btn btn-primary" href="/api/create">Ajouter une API</a>
         </section>
         <section class="py-3 flex flex-col items-center">
             <div class="w-full flex gap-3">
@@ -54,7 +54,7 @@
                         {% for api in data['items'] %}
                         <tr>
                             <th>{{ api.id }}</th>
-                            <td>{{ api.title }}</td>
+                            <td><a href="/api/{{ api.id }}" class="cursor-pointer">{{ api.title }}</a></td>
                             <td>{{ api.endpointUrl }}</td>
                             <td>En ligne</td>
                         </tr>
