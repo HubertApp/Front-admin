@@ -2,26 +2,27 @@ import os
 
 import httpx
 
-from app.forms.forms import APIForm, CreateAPIForm, ModifyAPIForm
+from app.forms.forms import CreateTransitNetworkForm, ModifyTransitNetworkForm
 
 
-async def get_apis_service(page: int, limit: int):
+async def get_apis_service(offset: int, limit: int):
     query = """
-        query GetApis($page: Int!, $limit: Int!){
-            getApis(page: $page, pageSize: $limit) {
+        query GetApis($offset: Int!, $limit: Int!){
+            getRegistredApis(offset: $offset, limit: $limit) {
                 items{
-                    id
-                    title
-                    type
+                    externalId
+                    name
+                    description
                     endpointUrl
                 }
                 totalCount
-                pageSize
-                page
+                totalPages
+                limit
+                offset
             }
         }
     """
-    variables = {"page": page, "limit": limit}
+    variables = {"offset": offset, "limit": limit}
     async with httpx.AsyncClient() as client:
         res = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
         return res
@@ -44,37 +45,40 @@ async def get_api_by_id_service(api_id):
         res = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
         return res
 
-async def create_api_service(form: CreateAPIForm):
+async def create_api_service(form: CreateTransitNetworkForm):
     query = """
-                    mutation CreateApi($title: String!, $type: String!, $apiKey: String!, $description: String!, $endpointUrl: String!) {
-                        createApi(input: {
-                            title: $title,
-                            type: $type,
-                            apiKey: $apiKey,
+                    mutation CreateApi($name: String!, $external_id: String!, $fournisseur_id: String!, $description: String!, $country_code: String!, $city_or_region: String!) {
+                        createApi(data: {
+                            name: $name,
+                            externalId: $external_id,
+                            fournisseurId: $fournisseur_id,
                             description: $description,
-                            endpointUrl: $endpointUrl
+                            countryCode: $country_code,
+                            cityOrRegion: $city_or_region
                         }) {
-                            id
-                            title
-                            type
-                            apiKey
-                            description
-                            endpointUrl
+                            name,
+                            externalId,
+                            fournisseurId,
+                            description,
+                            countryCode,
+                            cityOrRegion
                         }
                     }
                 """
+
     variables = {
-        "title": form.title.data,
-        "type": form.type.data,
-        "apiKey": form.api_key.data,
-        "description": form.description.data,
-        "endpointUrl": form.endpoint_url.data
+        "name" : form.title.data,
+        "external_id" : form.external_id.data,
+        "description" : form.description.data,
+        "country_code" : form.country_code.data,
+        "city_or_region" : form.city_or_region.data,
+        "fournisseur_id" : "FR_TRANSPORT_GOUV"
     }
     async with httpx.AsyncClient() as client:
         res = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
         return res
 
-async def modify_api_service(form: ModifyAPIForm, api_id: int):
+async def modify_api_service(form: ModifyTransitNetworkForm, api_id: int):
     query = """
         mutation ModifyApi($apiId: Int!, $title: String!, $type: String!, $apiKey: String!, $description: String!, $endpointUrl: String!) {
             modifyApiById(apiId: $apiId, input: {

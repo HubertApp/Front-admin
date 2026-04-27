@@ -1,0 +1,186 @@
+{% extends 'base.jinja'%}
+{% from './_partials/_form_errors.jinja' import form_errors%}
+{% block content%}
+<div class="bg-base-200 p-4 min-w-[50%] flex flex-col items-center">
+    <h1 class="text-3xl font-bold text-neutral">Ajouter une API</h1>
+    <div class="divider"></div>
+
+    <div class="form-control w-full max-w-xs relative mb-6">
+        <label class="input input-primary">
+          <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke-width="2.5"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </g>
+          </svg>
+          <input id="search-input" type="search" required placeholder="Rechercher une AOM" />
+        </label>
+        <ul id="results-list" class="menu bg-base-100 w-full border border-base-300 rounded-box mt-1 shadow-lg absolute top-full z-50 hidden max-h-60 overflow-y-auto"></ul>
+    </div>
+    <form method="POST" action="" class="w-full max-w-lg">
+        <div class="mb-4">
+            {{ form.title.label(class_="font-medium text-primary") }}
+            {{ form.title(class_="mt-1 w-full input input-primary") }}
+            {{ form_errors(form.title.errors) }}
+        </div>
+
+        <div class="mb-4">
+            {{ form.endpoint_url.label(class_="font-medium text-primary") }}
+            {{ form.endpoint_url(class_="mt-1 w-full input input-primary") }}
+            {{ form_errors(form.endpoint_url.errors) }}
+        </div>
+        <div class="mb-4">
+            {{ form.external_id.label(class_="font-medium text-primary") }}
+            {{ form.external_id(class_="mt-1 w-full input input-primary") }}
+            {{ form_errors(form.external_id.errors) }}
+        </div>
+        <div class="mb-4">
+            {{ form.country_code.label(class_="font-medium text-primary") }}
+            {{ form.country_code(class_="mt-1 w-full input input-primary") }}
+            {{ form_errors(form.country_code.errors) }}
+        </div>
+        <div class="mb-4">
+            {{ form.city_or_region.label(class_="font-medium text-primary") }}
+            {{ form.city_or_region(class_="mt-1 w-full input input-primary") }}
+            {{ form_errors(form.city_or_region.errors) }}
+        </div>
+        <div class="mb-4">
+            {{ form.description.label(class_="font-medium text-primary") }}
+            {{ form.description(class_="mt-1 w-full input textarea textarea-primary", rows="4") }}
+            {{ form_errors(form.description.errors) }}
+        </div>
+        <div class="flex justify-end">
+            {{ form.csrf_token }}
+            {{ form.submit(class_="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+<script>
+  let AOMDisponibles = [];
+  const GRAPHQL_ENDPOINT = "http://localhost:8001/graphql";
+  async function fetchToutesLesAOMs() {
+    const query = `
+      query ObtenirLesAOM($fournisseurId: String!) {
+        searchApis(fournisseurId: $fournisseurId) {
+          externalId
+          name
+          cityOrRegion
+          countryCode
+          resources {
+            title
+            format
+          }
+        }
+      }
+    `;
+    const variables = {
+      fournisseurId: "FR_TRANSPORT_GOUV"
+    };
+
+    try {
+      const response = await fetch(GRAPHQL_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({ query, variables })
+      });
+      const jsonResponse = await response.json();
+      if (jsonResponse.errors) {
+        console.error("Erreur renvoyée par GraphQL :", jsonResponse.errors);
+        return;
+      }
+      AOMDisponibles = jsonResponse.data.searchApis;
+
+    } catch (error) {
+      console.error("Erreur réseau ou serveur inaccessible :", error);
+    }
+  }
+  fetchToutesLesAOMs();
+</script>
+<script>
+    const searchInput = document.getElementById('search-input');
+    const resultsList = document.getElementById('results-list');
+
+    // Les champs à pré-remplir
+    const fieldId = document.getElementById('external_id');
+    const fieldRegion = document.getElementById('city_or_region');
+    const fieldCountryCode = document.getElementById('country_code');
+    const fieldName = document.getElementById('title');
+
+    searchInput.addEventListener('input', (e) => {
+        // Votre excellente logique de nettoyage
+        const query = e.target.value.toLowerCase().replace(/\s+/g, "");
+
+        if (query.length === 0) {
+            resultsList.classList.add('hidden');
+            clearFormFields();
+            return;
+        }
+
+        const filtered = AOMDisponibles
+            .filter(item => {
+                const cleanName = item.name.toLowerCase().replace(/\s+/g, "");
+                return cleanName.includes(query);
+            })
+            .slice(0, 5);
+
+        if (filtered.length > 0) {
+            renderResults(filtered);
+            resultsList.classList.remove('hidden');
+        } else {
+            resultsList.innerHTML = '<li class="disabled"><a>Aucun résultat</a></li>';
+            resultsList.classList.remove('hidden');
+        }
+    });
+
+    function renderResults(results) {
+        resultsList.innerHTML = '';
+
+        results.forEach(item => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.textContent = item.name;
+
+            a.addEventListener('click', () => {
+                searchInput.value = item.name;
+
+                resultsList.classList.add('hidden');
+
+                fillFormFields(item);
+            });
+
+            li.appendChild(a);
+            resultsList.appendChild(li);
+        });
+    }
+
+    function fillFormFields(item) {
+        console.log(item)
+        fieldId.value = item.externalId || 'N/A';
+        fieldRegion.value = item.cityOrRegion || 'N/A';
+        fieldName.value = item.name || 'N/A';
+        fieldCountryCode.value = item.countryCode || 'N/A';
+    }
+
+    // Fonction pour vider les champs
+    function clearFormFields() {
+        fieldId.value = '';
+        fieldRegion.value = '';
+    }
+
+    // Fermer la liste si on clique en dehors
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) {
+            resultsList.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock%}

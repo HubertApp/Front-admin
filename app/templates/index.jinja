@@ -44,19 +44,19 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>ID Fournisseur</th>
                             <th>Titre</th>
-                            <th>URL</th>
+                            <th>Description</th>
                             <th>Etat</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for api in data['items'] %}
                         <tr>
-                            <th>{{ api.id }}</th>
-                            <td><a href="/api/{{ api.id }}" class="cursor-pointer">{{ api.title }}</a></td>
-                            <td>{{ api.endpointUrl }}</td>
-                            <td>En ligne</td>
+                            <th>{{ api.externalId }}</th>
+                            <td><a href="/api/{{ api.id }}" class="cursor-pointer">{{ api.name }}</a></td>
+                            <td>{{ api.description }}</td>
+                            <td>En attente</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -65,7 +65,7 @@
         </section>
         <section class="flex flex-col items-center p-3">
             <div class="join">
-                {% for i in range(1, data['totalCount'] + 1) %}
+                {% for i in range(1, data['totalPages']) %}
                 {% if i == data['page'] %}
                 <button class="join-item btn btn-md btn-active">{{ i }}</button>
                 {% else %}
