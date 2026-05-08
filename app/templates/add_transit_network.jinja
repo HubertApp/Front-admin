@@ -116,7 +116,6 @@
     const fieldName = document.getElementById('title');
 
     searchInput.addEventListener('input', (e) => {
-        // Votre excellente logique de nettoyage
         const query = e.target.value.toLowerCase().replace(/\s+/g, "");
 
         if (query.length === 0) {
@@ -170,13 +169,10 @@
         fieldCountryCode.value = item.countryCode || 'N/A';
     }
 
-    // Fonction pour vider les champs
     function clearFormFields() {
         fieldId.value = '';
         fieldRegion.value = '';
     }
-
-    // Fermer la liste si on clique en dehors
     document.addEventListener('click', (e) => {
         if (!searchInput.contains(e.target) && !resultsList.contains(e.target)) {
             resultsList.classList.add('hidden');

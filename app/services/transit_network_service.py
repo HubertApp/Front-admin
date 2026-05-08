@@ -2,6 +2,7 @@ import os
 
 import httpx
 
+from app.core.config import properties, secrets
 from app.forms.forms import CreateTransitNetworkForm, ModifyTransitNetworkForm
 
 
@@ -24,7 +25,7 @@ async def get_transit_network_service(offset: int, limit: int):
     """
     variables = {"offset": offset, "limit": limit}
     async with httpx.AsyncClient() as client:
-        res = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
+        res = await client.post(properties.URL_GATEWAY + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {secrets.GATEWAY_KEY}"})
         return res
 
 async def get_transit_network_by_id_service(api_id):
@@ -42,7 +43,7 @@ async def get_transit_network_by_id_service(api_id):
     """
     variables = {"api_id": int(api_id)}
     async with httpx.AsyncClient() as client:
-        res = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
+        res = await client.post(properties.URL_GATEWAY + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {secrets.GATEWAY_KEY}"})
         return res
 
 async def create_transit_network_service(form: CreateTransitNetworkForm):
@@ -75,7 +76,7 @@ async def create_transit_network_service(form: CreateTransitNetworkForm):
         "fournisseur_id" : "FR_TRANSPORT_GOUV"
     }
     async with httpx.AsyncClient() as client:
-        res = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
+        res = await client.post(properties.URL_GATEWAY + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {secrets.GATEWAY_KEY}"})
         return res
 
 async def modify_transit_network_service(form: ModifyTransitNetworkForm, api_id: int):
@@ -106,5 +107,5 @@ async def modify_transit_network_service(form: ModifyTransitNetworkForm, api_id:
         "endpointUrl": form.endpoint_url.data
     }
     async with httpx.AsyncClient() as client:
-        res = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
+        res = await client.post(properties.URL_GATEWAY + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {secrets.GATEWAY_KEY}"})
         return res
