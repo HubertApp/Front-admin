@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 
-class ApiResponseObj (BaseModel):
+class TransitNetworkResponseObj (BaseModel):
     id:int
     title:str
     description:str

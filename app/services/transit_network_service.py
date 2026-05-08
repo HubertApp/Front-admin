@@ -5,10 +5,10 @@ import httpx
 from app.forms.forms import CreateTransitNetworkForm, ModifyTransitNetworkForm
 
 
-async def get_apis_service(offset: int, limit: int):
+async def get_transit_network_service(offset: int, limit: int):
     query = """
-        query GetApis($offset: Int!, $limit: Int!){
-            getRegistredApis(offset: $offset, limit: $limit) {
+        query GetTransitNetworks($offset: Int!, $limit: Int!){
+            getRegistredTransitNetworks(offset: $offset, limit: $limit) {
                 items{
                     externalId
                     name
@@ -27,9 +27,9 @@ async def get_apis_service(offset: int, limit: int):
         res = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
         return res
 
-async def get_api_by_id_service(api_id):
+async def get_transit_network_by_id_service(api_id):
     query = """
-        query GetApiById($api_id: Int!){
+        query GetTransitNetwork($api_id: Int!){
             getApiById(apiId: $api_id) {
                 id
                 title
@@ -45,10 +45,10 @@ async def get_api_by_id_service(api_id):
         res = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
         return res
 
-async def create_api_service(form: CreateTransitNetworkForm):
+async def create_transit_network_service(form: CreateTransitNetworkForm):
     query = """
-                    mutation CreateApi($name: String!, $external_id: String!, $fournisseur_id: String!, $description: String!, $country_code: String!, $city_or_region: String!) {
-                        createApi(data: {
+                    mutation CreateTN($name: String!, $external_id: String!, $fournisseur_id: String!, $description: String!, $country_code: String!, $city_or_region: String!) {
+                        createTransitNetwork(data: {
                             name: $name,
                             externalId: $external_id,
                             fournisseurId: $fournisseur_id,
@@ -78,7 +78,7 @@ async def create_api_service(form: CreateTransitNetworkForm):
         res = await client.post(os.getenv("URL_GATEWAY") + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {os.getenv('GATEWAY_KEY')}"})
         return res
 
-async def modify_api_service(form: ModifyTransitNetworkForm, api_id: int):
+async def modify_transit_network_service(form: ModifyTransitNetworkForm, api_id: int):
     query = """
         mutation ModifyApi($apiId: Int!, $title: String!, $type: String!, $apiKey: String!, $description: String!, $endpointUrl: String!) {
             modifyApiById(apiId: $apiId, input: {

@@ -1,4 +1,6 @@
 from wtforms import Form, StringField, SelectField, validators, SubmitField, TextAreaField
+from wtforms.fields.choices import SelectMultipleField
+
 
 class TransitNetworkForm(Form):
     title = StringField('Titre', [validators.InputRequired(), validators.Length(max=200)], render_kw={"placeholder": "Titre du réseau de transport..."})
@@ -8,6 +10,7 @@ class TransitNetworkForm(Form):
     endpoint_url = StringField('URL', [validators.optional(), validators.URL(), validators.Length(max=200)], render_kw={"placeholder": "https://api.exemple.com/endpoint..."})
     #api_key = StringField('Clé API', [validators.Optional(), validators.Length(max=100)], render_kw={"placeholder": "Clé API si nécessaire..."})
     city_or_region = StringField("Ville ou Zone concernée", [validators.InputRequired()])
+    resources = SelectMultipleField("Ressources", [validators.Optional()])
     country_code = StringField('Code du Pays', [validators.InputRequired()])
 
 
