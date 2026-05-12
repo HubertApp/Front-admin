@@ -7,6 +7,7 @@ import httpx
 import requests, dotenv, os
 from starlette.middleware.sessions import SessionMiddleware
 
+from app.core.config import properties
 from app.forms.forms import CreateTransitNetworkForm, ModifyTransitNetworkForm
 from app.objects.transit_network_obj import TransitNetworkResponseObj
 from app.services.transit_network_service import get_transit_network_service, create_transit_network_service, get_transit_network_by_id_service, modify_transit_network_service
@@ -18,7 +19,7 @@ templates = Jinja2Templates(directory="app/templates")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
-
+templates.env.globals['URL_GATEWAY'] = properties.URL_GATEWAY
 @app.get("/")
 async def index(request: Request, page: int = 1, limit: int = 25):
     response = await get_transit_network_service(0, limit)

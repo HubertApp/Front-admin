@@ -48,24 +48,25 @@ async def get_transit_network_by_id_service(api_id):
 
 async def create_transit_network_service(form: CreateTransitNetworkForm):
     query = """
-                    mutation CreateTN($name: String!, $external_id: String!, $fournisseur_id: String!, $description: String!, $country_code: String!, $city_or_region: String!) {
-                        createTransitNetwork(data: {
-                            name: $name,
-                            externalId: $external_id,
-                            fournisseurId: $fournisseur_id,
-                            description: $description,
-                            countryCode: $country_code,
-                            cityOrRegion: $city_or_region
-                        }) {
-                            name,
-                            externalId,
-                            fournisseurId,
-                            description,
-                            countryCode,
-                            cityOrRegion
-                        }
+                mutation CreateTN($name: String!, $external_id: String!, $fournisseur_id: String!, $description: String!, $country_code: String!, $city_or_region: String!, $resources: [ResourceInput!]!) {
+                    createTransitNetwork(data: {
+                        name: $name,
+                        externalId: $external_id,
+                        fournisseurId: $fournisseur_id,
+                        description: $description,
+                        countryCode: $country_code,
+                        cityOrRegion: $city_or_region,
+                        resources: $resources 
+                    }) {
+                        name,
+                        externalId,
+                        fournisseurId,
+                        description,
+                        countryCode,
+                        cityOrRegion
                     }
-                """
+                }
+            """
 
     variables = {
         "name" : form.title.data,
@@ -73,7 +74,8 @@ async def create_transit_network_service(form: CreateTransitNetworkForm):
         "description" : form.description.data,
         "country_code" : form.country_code.data,
         "city_or_region" : form.city_or_region.data,
-        "fournisseur_id" : "FR_TRANSPORT_GOUV"
+        "fournisseur_id" : "FR_TRANSPORT_GOUV",
+        "resources" : form.resources.data
     }
     async with httpx.AsyncClient() as client:
         res = await client.post(properties.URL_GATEWAY + "/graphql", json={"query": query, "variables": variables}, headers={"Authorization": f"Bearer {secrets.GATEWAY_KEY}"})
