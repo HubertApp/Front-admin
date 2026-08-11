@@ -1,0 +1,88 @@
+{% extends 'base.jinja'%}
+{% from './_partials/_form_errors.jinja' import form_errors%}
+{% block content%}
+<div class="bg-base-200 p-4 min-w-[50%] flex flex-col items-center">
+    <h1 class="text-3xl font-bold text-neutral">Ajouter une API</h1>
+    <div class="divider"></div>
+
+    <div class="form-control w-full max-w-xs relative mb-6">
+        <label class="input input-primary">
+          <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke-width="2.5"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </g>
+          </svg>
+          <input id="search-input" type="search" required placeholder="Rechercher une AOM" />
+        </label>
+        <ul id="results-list" class="menu bg-base-100 w-full border border-base-300 rounded-box mt-1 shadow-lg absolute top-full z-50 hidden max-h-60 overflow-y-auto"></ul>
+    </div>
+    <form method="POST" action="" class="w-full max-w-lg">
+        <div class="mb-4">
+            {{ form.title.label(class_="font-medium text-primary") }}
+            {{ form.title(class_="mt-1 w-full input input-primary") }}
+            {{ form_errors(form.title.errors) }}
+        </div>
+
+        <div class="mb-4">
+            {{ form.endpoint_url.label(class_="font-medium text-primary") }}
+            {{ form.endpoint_url(class_="mt-1 w-full input input-primary") }}
+            {{ form_errors(form.endpoint_url.errors) }}
+        </div>
+        <div class="mb-4">
+            {{ form.external_id.label(class_="font-medium text-primary") }}
+            {{ form.external_id(class_="mt-1 w-full input input-primary", readonly=true) }}
+            {{ form_errors(form.external_id.errors) }}
+        </div>
+        <div class="mb-4">
+            {{ form.country_code.label(class_="font-medium text-primary") }}
+            {{ form.country_code(class_="mt-1 w-full input input-primary") }}
+            {{ form_errors(form.country_code.errors) }}
+        </div>
+        <div class="mb-4">
+            {{ form.city_or_region.label(class_="font-medium text-primary") }}
+            {{ form.city_or_region(class_="mt-1 w-full input input-primary") }}
+            {{ form_errors(form.city_or_region.errors) }}
+        </div>
+        <div class="mb-4">
+            {{ form.description.label(class_="font-medium text-primary") }}
+            {{ form.description(class_="mt-1 w-full input textarea textarea-primary", rows="4") }}
+            {{ form_errors(form.description.errors) }}
+        </div>
+        <div class="divider">Ressources incluses</div>
+        <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 mb-4">
+          <table class="table w-full">
+            <thead class="">
+              <tr>
+                <th class="w-2/4">Titre de la ressource</th>
+                <th class="w-1/4">Format</th>
+                  <th class="w-1/4">URL</th>
+              </tr>
+            </thead>
+
+            <tbody id="resources-container">
+
+            </tbody>
+
+          </table>
+        </div>
+        <div class="flex justify-end">
+            {{ form.csrf_token }}
+            {{ form.submit(class_="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+<script src="../static/scripts/fillingTransitNetworkFields.js"></script>
+<script src="../static/scripts/researchTransitNetworks.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        fetchToutesLesAOMs("{{ URL_GATEWAY }}");
+    });
+</script>
+{% endblock%}

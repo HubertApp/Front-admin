@@ -3,12 +3,14 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import httpx
-from app.forms.forms import APIForm, CreateAPIForm, ModifyAPIForm
+
 import requests, dotenv, os
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.objects.api_obj import ApiResponseObj
-from app.services.api_service import get_apis_service, create_api_service, get_api_by_id_service, modify_api_service
+from app.core.config import properties
+from app.forms.forms import CreateTransitNetworkForm, ModifyTransitNetworkForm
+from app.objects.transit_network_obj import TransitNetworkResponseObj
+from app.services.transit_network_service import get_transit_network_service, create_transit_network_service, get_transit_network_by_id_service, modify_transit_network_service
 
 dotenv.load_dotenv()
 
@@ -17,25 +19,25 @@ templates = Jinja2Templates(directory="app/templates")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
-
+templates.env.globals['URL_GATEWAY'] = properties.URL_GATEWAY
 @app.get("/")
 async def index(request: Request, page: int = 1, limit: int = 25):
-    response = await get_apis_service(page, limit)
+    response = await get_transit_network_service(0, limit)
     if response.status_code == 200:
-        data = response.json().get("data", {}).get("getApis", [])
+        data = response.json().get("data", {}).get("getRegistredTransitNetworks", [])
         return templates.TemplateResponse("index.jinja", {"request": request, "data": data, "messages": request.session.pop('flash_messages', [])})
     return templates.TemplateResponse("index.jinja", {"request": request, "messages": request.session.pop('flash_messages', []), "data": {"items": [], "total": 0, "totalPages": 0, "page": page}})
 
 @app.get("/api/create")
 @app.post("/api/create")
 async def api_create(request: Request):
-    form = CreateAPIForm()
+    form = CreateTransitNetworkForm()
     request.session.setdefault('flash_messages', [])
     if request.method == "POST":
         form_data = await request.form()
-        form = CreateAPIForm(formdata=form_data)
+        form = CreateTransitNetworkForm(formdata=form_data)
         if form.validate():
-            response = await create_api_service(form)
+            response = await create_transit_network_service(form)
             if response.status_code == 200:
                 print("Données envoyées avec succès au gateway.")
                 request.session['flash_messages'].append(("API enregistrée.", "success"))
@@ -45,19 +47,19 @@ async def api_create(request: Request):
         else:
             request.session['flash_messages'].append(("Données de formulaire invalides.", "error"))
 
-    return templates.TemplateResponse("add_api.jinja", {"request": request, "form" : form, "messages": request.session.pop('flash_messages', [])})
+    return templates.TemplateResponse("add_transit_network.jinja", {"request": request, "form" : form, "messages": request.session.pop('flash_messages', [])})
 
 
 @app.get("/api/{api_id}")
 @app.post("/api/{api_id}")
 async def api_details(request: Request, api_id: str):
     request.session.setdefault('flash_messages', [])
-    api_infos_response = await get_api_by_id_service(api_id)
+    api_infos_response = await get_transit_network_by_id_service(api_id)
     data = api_infos_response.json().get("data", {}).get("getApiById", {})
-    form = ModifyAPIForm(obj=ApiResponseObj(**data))
+    form = ModifyTransitNetworkForm(obj=TransitNetworkResponseObj(**data))
     if request.method == "POST":
         form_data = await request.form()
-        new_data_form = ModifyAPIForm(form_data)
+        new_data_form = ModifyTransitNetworkForm(form_data)
         if new_data_form.validate():
             old_datas = {
                 cle: valeur
@@ -71,7 +73,7 @@ async def api_details(request: Request, api_id: str):
             }
             if old_datas == new_datas:
                 return RedirectResponse(url='/', status_code=303)
-            response = await modify_api_service(new_data_form, int(api_id))
+            response = await modify_transit_network_service(new_data_form, int(api_id))
             if response.status_code == 200:
                 print("Données envoyées avec succès au gateway.")
                 request.session['flash_messages'].append(("API enregistrée.", "success"))
