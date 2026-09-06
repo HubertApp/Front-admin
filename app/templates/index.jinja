@@ -1,8 +1,14 @@
 {% extends 'base.jinja'%}
+{% set STATUS_BADGES = {
+    'PENDING_AGGREGATION': 'badge-warning',
+    'DATA_AVAILABLE': 'badge-success',
+    'AGGREGATION_ERROR': 'badge-error',
+    'OUT_OF_SERVICE': 'badge-ghost'
+} %}
 {% block content%}
 <div class="p-4 min-w-[50%] flex flex-col items-center">
     <div class="w-full">
-        <h1 class="text-3xl font-bold text-neutral">Manage API(s)</h1>
+        <h1 class="text-3xl font-bold text-neutral">Réseaux de transport</h1>
         <div class="divider"></div>
         <section class="w-full flex justify-between py-3">
             <label class="input">
@@ -15,7 +21,7 @@
                 </svg>
                 <input type="search" class="grow" placeholder="Search" />
             </label>
-            <a class="btn btn-primary" href="/api/create">Ajouter une API</a>
+            <a class="btn btn-primary" href="/transit-networks/create">Ajouter un réseau de transport</a>
         </section>
         <section class="py-3 flex flex-col items-center">
             <div class="w-full flex gap-3">
@@ -51,12 +57,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for api in data['items'] %}
+                        {% for network in data['items'] %}
                         <tr>
-                            <th>{{ api.externalId }}</th>
-                            <td><a href="/api/{{ api.id }}" class="cursor-pointer">{{ api.name }}</a></td>
-                            <td>{{ api.description }}</td>
-                            <td>En attente</td>
+                            <th>{{ network.externalId }}</th>
+                            <td><a href="/transit-networks/{{ network.externalId }}" class="cursor-pointer">{{ network.name }}</a></td>
+                            <td>{{ network.description }}</td>
+                            <td><span class="badge {{ STATUS_BADGES.get(network.status, 'badge-ghost') }}">{{ network.statusLabel }}</span></td>
                         </tr>
                         {% endfor %}
                     </tbody>

@@ -1,35 +1,31 @@
 {% extends 'base.jinja'%}
 {% from './_partials/_form_errors.jinja' import form_errors%}
+{% set STATUS_BADGES = {
+    'PENDING_AGGREGATION': 'badge-warning',
+    'DATA_AVAILABLE': 'badge-success',
+    'AGGREGATION_ERROR': 'badge-error',
+    'OUT_OF_SERVICE': 'badge-ghost'
+} %}
 {% block content%}
+<a href="/" class="btn btn-secondary mb-6">Retour</a>
 <div class="bg-base-200 p-4 min-w-[50%] flex flex-col items-center">
-    <h1 class="text-3xl font-bold text-neutral">Ajouter un réseau de transport</h1>
+    <h1 class="text-3xl font-bold text-neutral">Consultation du réseau de transport "{{transit_network_infos.get('name')}}"</h1>
     <div class="divider"></div>
-
-    <div class="form-control w-full max-w-xs relative mb-6">
-        <label class="input input-primary">
-          <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <g
-              stroke-linejoin="round"
-              stroke-linecap="round"
-              stroke-width="2.5"
-              fill="none"
-              stroke="currentColor"
-            >
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.3-4.3"></path>
-            </g>
-          </svg>
-          <input id="search-input" type="search" required placeholder="Rechercher une AOM" />
-        </label>
-        <ul id="results-list" class="menu bg-base-100 w-full border border-base-300 rounded-box mt-1 shadow-lg absolute top-full z-50 hidden max-h-60 overflow-y-auto"></ul>
+    <div class="w-full max-w-lg flex items-center justify-between gap-4 mb-6">
+        <div class="flex items-center gap-2">
+            <span class="font-medium text-primary">État de l'agrégation</span>
+            <span class="badge {{ STATUS_BADGES.get(transit_network_infos.get('status'), 'badge-ghost') }}">{{ transit_network_infos.get('statusLabel', 'Inconnu') }}</span>
+        </div>
+        <form method="post" action="/transit-networks/{{ transit_network_infos.get('externalId') }}/retrigger">
+            <button type="submit" class="btn btn-secondary btn-sm">Relancer l'agrégation</button>
+        </form>
     </div>
-    <form method="POST" action="" class="w-full max-w-lg">
+    <form method="post" action="" class="w-full max-w-lg">
         <div class="mb-4">
             {{ form.title.label(class_="font-medium text-primary") }}
             {{ form.title(class_="mt-1 w-full input input-primary") }}
             {{ form_errors(form.title.errors) }}
         </div>
-
         <div class="mb-4">
             {{ form.endpoint_url.label(class_="font-medium text-primary") }}
             {{ form.endpoint_url(class_="mt-1 w-full input input-primary") }}
@@ -55,34 +51,10 @@
             {{ form.description(class_="mt-1 w-full input textarea textarea-primary", rows="4") }}
             {{ form_errors(form.description.errors) }}
         </div>
-        <div class="divider">Ressources incluses</div>
-        <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 mb-4">
-          <table class="table w-full">
-            <thead class="">
-              <tr>
-                <th class="w-2/4">Titre de la ressource</th>
-                <th class="w-1/4">Format</th>
-                  <th class="w-1/4">URL</th>
-              </tr>
-            </thead>
-
-            <tbody id="resources-container">
-
-            </tbody>
-
-          </table>
-        </div>
         <div class="flex justify-end">
             {{ form.csrf_token }}
             {{ form.submit(class_="btn btn-primary") }}
         </div>
     </form>
 </div>
-<script src="../static/scripts/fillingTransitNetworkFields.js"></script>
-<script src="../static/scripts/researchTransitNetworks.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        fetchToutesLesAOMs("{{ URL_GATEWAY }}");
-    });
-</script>
 {% endblock%}

@@ -18,7 +18,7 @@ async function fetchToutesLesAOMs(URL_GATEWAY) {
       }
     }
   `;
-  const GRAPHQL_ENDPOINT = URL_GATEWAY + "/graphql";
+  const GRAPHQL_ENDPOINT = URL_GATEWAY;
   const variables = {
     fournisseurId: "FR_TRANSPORT_GOUV"
   };
