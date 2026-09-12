@@ -1,0 +1,19 @@
+services:
+  front-admin:
+    build: .
+    container_name: front-admin
+    ports:
+      - "8004:80"
+    volumes:
+      - .:/project
+    command: "uvicorn main:app --host 0.0.0.0 --port 80 --reload --reload-dir /project"
+    env_file:
+      - .env
+    environment:
+      - URL_GATEWAY=http://host.docker.internal:4000
+    networks:
+      - hubert-network
+
+networks:
+  hubert-network:
+    external: true

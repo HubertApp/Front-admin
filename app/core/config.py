@@ -15,7 +15,7 @@ class Properties(BaseSettings):
     APP_NAME: str = "HubberApp Admin Website"
     DEBUG: bool = True
     LOG_LEVEL: str = "INFO"
-    URL_GATEWAY: str = "http://localhost:8000"
+    URL_GATEWAY: str = "http://localhost:4000"
     model_config = SettingsConfigDict(
         env_file="application.properties",
         env_file_encoding="utf-8",

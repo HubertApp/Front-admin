@@ -1,10 +1,19 @@
+from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
 
-class TransitNetworkResponseObj (BaseModel):
-    id:int
-    title:str
-    description:str
-    type:str
-    api_key:str = Field(validation_alias="apiKey")
-    endpoint_url:str = Field(validation_alias="endpointUrl")
+class ResourceResponseObj(BaseModel):
+    title: str
+    format: str
+    endpointUrl: str
+
+
+class TransitNetworkResponseObj(BaseModel):
+    title: str = Field(validation_alias="name")
+    external_id: str = Field(validation_alias="externalId")
+    description: Optional[str] = None
+    country_code: str = Field(validation_alias="countryCode")
+    city_or_region: str = Field(validation_alias="cityOrRegion")
+    endpoint_url: Optional[str] = Field(default=None, validation_alias="endpointUrl")
+    resources: List[ResourceResponseObj] = []
