@@ -19,7 +19,7 @@ templates = Jinja2Templates(directory="app/templates")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
-templates.env.globals['URL_GATEWAY'] = properties.URL_GATEWAY
+templates.env.globals['URL_GATEWAY'] = properties.URL_GATEWAY_PUBLIC
 @app.get("/")
 async def index(request: Request, page: int = 1, limit: int = 25):
     response = await get_transit_network_service(0, limit)

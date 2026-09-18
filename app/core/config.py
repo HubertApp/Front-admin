@@ -16,6 +16,8 @@ class Properties(BaseSettings):
     DEBUG: bool = True
     LOG_LEVEL: str = "INFO"
     URL_GATEWAY: str = "http://localhost:4000"
+    # URL vue par le navigateur (scripts JS), distincte de celle utilisée côté serveur depuis le conteneur
+    URL_GATEWAY_PUBLIC: str = "http://localhost:4000"
     model_config = SettingsConfigDict(
         env_file="application.properties",
         env_file_encoding="utf-8",
